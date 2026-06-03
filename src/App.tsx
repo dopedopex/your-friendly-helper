@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, History, ArrowLeft } from "lucide-react";
+import { Shield, History, ArrowLeft, Wallet2 } from "lucide-react";
 import { api, type RoundView } from "./lib/api";
 import { useAccount, useBalance } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -7,7 +7,8 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import RoundCard from "./components/RoundCard";
 import ProvablyFair from "./components/ProvablyFair";
 import Home from "./components/Home";
-import YourBets, { type LiveBet } from "./components/YourBets";
+import { type LiveBet } from "./components/YourBets";
+import YourBetsModal from "./components/YourBetsModal";
 import WalletButton from "./components/WalletButton";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
   const [head, setHead] = React.useState<number | null>(null);
   const [pfBlock, setPfBlock] = React.useState<number | null>(null);
   const [liveBets, setLiveBets] = React.useState<LiveBet[]>([]);
+  const [showYourBets, setShowYourBets] = React.useState(false);
 
   const { address, isConnected } = useAccount();
   const { data: balance, refetch: refetchBal } = useBalance({ address });
@@ -116,8 +118,37 @@ export default function App() {
 
         <div className="wrap">
           <button className="back-link" onClick={() => setView("home")}><ArrowLeft size={14} /> Back to home</button>
-          <h1 className="page-title">Live Rounds</h1>
-          <p className="page-sub">Place bets while a round is open. Stack multiple modes, each is a flat 0.01 zkLTC.</p>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+            <div>
+              <h1 className="page-title">Live Rounds</h1>
+              <p className="page-sub">Place bets while a round is open. Stack multiple modes, each is a flat 0.01 zkLTC.</p>
+            </div>
+            {addr && (
+              <button
+                onClick={() => setShowYourBets(true)}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 10,
+                  background: "#fff", color: "#0a0a0a", border: "3px solid #000",
+                  borderRadius: 12, padding: "12px 20px", fontWeight: 900,
+                  fontFamily: "'Space Grotesk',system-ui,sans-serif",
+                  letterSpacing: ".04em", textTransform: "uppercase",
+                  boxShadow: "5px 5px 0 0 rgba(0,0,0,.9)", cursor: "pointer",
+                  transition: "transform .15s ease, box-shadow .15s ease",
+                }}
+                onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "translate(3px,3px)"; (e.currentTarget as HTMLButtonElement).style.boxShadow = "2px 2px 0 0 rgba(0,0,0,.9)"; }}
+                onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = ""; (e.currentTarget as HTMLButtonElement).style.boxShadow = "5px 5px 0 0 rgba(0,0,0,.9)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = ""; (e.currentTarget as HTMLButtonElement).style.boxShadow = "5px 5px 0 0 rgba(0,0,0,.9)"; }}
+              >
+                <Wallet2 size={16} /> Your Bets
+                {liveBets.length > 0 && (
+                  <span style={{ background: "#3b82f6", color: "#fff", borderRadius: 999,
+                    padding: "2px 9px", fontSize: 12, border: "2px solid #000" }}>
+                    {liveBets.length}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
 
           <div className="zone-grid">
             <div className="rounds">
@@ -128,6 +159,7 @@ export default function App() {
                   round={r}
                   slot={i === 0 ? "closing" : "open"}
                   addr={addr}
+                  head={head}
                   onNeedConnect={() => openConnectModal?.()}
                   onOpenPF={(b) => setPfBlock(b)}
                   onBet={(info) => handleBet(r.id, info)}
@@ -148,19 +180,21 @@ export default function App() {
                   </div>
                 );
               })}
-              {addr && (
-                <YourBets
-                  address={addr}
-                  liveBets={liveBets}
-                  rounds={rounds.map((r) => ({ id: r.id, lockAt: r.lockAt, settleAt: r.settleAt }))}
-                />
-              )}
             </aside>
           </div>
         </div>
       </div>
 
       {pfBlock != null && <ProvablyFair block={pfBlock} onClose={() => setPfBlock(null)} />}
+      {showYourBets && (
+        <YourBetsModal
+          address={addr}
+          liveBets={liveBets}
+          rounds={rounds.map((r) => ({ id: r.id, lockAt: r.lockAt, settleAt: r.settleAt }))}
+          head={head}
+          onClose={() => setShowYourBets(false)}
+        />
+      )}
     </>
   );
 }

@@ -19,9 +19,10 @@ function useNow() {
 }
 
 export default function RoundCard({
-  round, slot, addr, onNeedConnect, onOpenPF, onBet,
+  round, slot, addr, head, onNeedConnect, onOpenPF, onBet,
 }: {
   round: RoundView; slot: "closing" | "open"; addr: string | null;
+  head: number | null;
   onNeedConnect: () => void; onOpenPF: (b: number) => void;
   onBet: (i: { mode: string; pick: string; txHash: string }) => void;
 }) {
@@ -70,7 +71,7 @@ export default function RoundCard({
     if (!addr) { onNeedConnect(); return; }
     if (!isOpen) return;
     if (mode.kind === "binary") setPick(side);
-    else if (mode.kind === "digit") setPick("0");
+    // digit mode: keep whatever the user already selected from the pick grid
     else setPick("");
     setLeverPulled(side);            // pull the lever inside the side button
     setConfirmPulled(false);
@@ -149,6 +150,24 @@ export default function RoundCard({
 
           <div className="pm-prog-thin"><div className="fill" style={{ width: `${pct}%` }} /></div>
 
+          {/* EST. TARGET BLOCK */}
+          {head != null && (
+            <div style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              margin: "10px 0 4px", padding: "8px 12px", borderRadius: 10,
+              background: isLocked ? "rgba(249,115,22,.14)" : "rgba(255,255,255,.04)",
+              border: `1px solid ${isLocked ? "rgba(249,115,22,.5)" : "var(--line)"}`,
+            }}>
+              <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase",
+                color: "var(--muted)", fontWeight: 700 }}>Est. Target Block</span>
+              <span className="mono" style={{
+                fontSize: 14, fontWeight: 700,
+                color: isLocked ? "#fb923c" : "#fff",
+                textShadow: isLocked ? "0 0 12px rgba(249,115,22,.6)" : "none",
+              }}>#{(head + Math.round(msToSettle / 200)).toLocaleString()} <span style={{ opacity: .6 }}>~</span></span>
+            </div>
+          )}
+
           {/* banks */}
           <div className="pm-banks">
             <div><p>Total Pot</p><b className="gold">◆ {totalPot.toFixed(2)}</b></div>
@@ -191,7 +210,12 @@ export default function RoundCard({
           {mode.kind !== "binary" && (
             <div className="pm-other">
               {mode.kind === "digit" && (
-                <div className="pick-grid">{HEX.map((d) => <button key={d} className={`pick ${pick === d ? "sel" : ""}`} onClick={() => setPick(d)}>{d}</button>)}</div>
+                <div className="pick-grid">{HEX.map((d) => (
+                  <button key={d} className={`pick ${pick === d ? "sel" : ""}`}
+                    onClick={() => { console.log('digit clicked:', d); setPick(d); }}>
+                    {d}
+                  </button>
+                ))}</div>
               )}
               {(mode.kind === "number" || mode.kind === "pvp") && (
                 <input className="num-input" type="number" placeholder={`Enter ${mode.hint}`} value={num} onChange={(e) => setNum(e.target.value)} />
