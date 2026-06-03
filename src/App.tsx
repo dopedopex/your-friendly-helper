@@ -5,6 +5,7 @@ import { useAccount, useBalance } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 import RoundCard from "./components/RoundCard";
+import RoundsCarousel from "./components/RoundsCarousel";
 import ProvablyFair from "./components/ProvablyFair";
 import Home from "./components/Home";
 import { type LiveBet } from "./components/YourBets";
@@ -182,20 +183,18 @@ export default function App() {
           </div>
 
           <div className="zone-grid">
-            <div className="rounds">
+            <div className="rounds-carousel-wrap">
               {rounds.length === 0 && <div className="empty">Connecting to the round engine…</div>}
-              {rounds.map((r, i) => (
-                <RoundCard
-                  key={r.id}
-                  round={r}
-                  slot={i === 0 ? "closing" : "open"}
+              {rounds.length > 0 && (
+                <RoundsCarousel
+                  rounds={rounds}
                   addr={addr}
                   head={head}
                   onNeedConnect={() => openConnectModal?.()}
                   onOpenPF={(b) => setPfBlock(b)}
-                  onBet={(info) => handleBet(r.id, info)}
+                  onBet={handleBet}
                 />
-              ))}
+              )}
             </div>
 
             <aside className="side">
