@@ -287,48 +287,66 @@ export default function RoundCard({
                   </button>
                 ))}</div>
               )}
-              {(mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock") && (
+              {mode.kind === "perfectblock" && (
+                <div className="pb-input-wrap">
+                  <span className="pb-prefix">#{pbPrefix ? Number(pbPrefix).toLocaleString() : ""}</span>
+                  <input
+                    className="num-input pb-input"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000"
+                    maxLength={3}
+                    value={num}
+                    onChange={(e) => setNum(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                  />
+                </div>
+              )}
+              {(mode.kind === "number" || mode.kind === "pvp") && (
                 <input
                   className="num-input"
-                  type="number"
-                  placeholder={
-                    mode.kind === "perfectblock" ? "Exact block #" : `Enter ${mode.hint}`
-                  }
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={`Enter ${mode.hint}`}
                   value={num}
-                  onChange={(e) => setNum(e.target.value)}
+                  onChange={(e) => setNum(e.target.value.replace(/\D/g, ""))}
                 />
               )}
               {mode.kind === "perfectblock" && (
-                <div style={{
-                  fontSize: 12, color: "var(--text-2)", margin: "-6px 0 12px",
-                }}>
-                  <span>Guess the exact block number to win <b style={{ color: "#fde047" }}>50×</b></span>
+                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {(BET * mode.multiplier).toFixed(4)} zkLTC</b> (50×)</span>
+                </div>
+              )}
+              {mode.kind === "number" && (
+                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {(BET * mode.multiplier).toFixed(4)} zkLTC</b> ({mode.multiplier}×)</span>
+                </div>
+              )}
+              {mode.kind === "pvp" && (
+                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {totalPot.toFixed(2)} zkLTC</b> (winner takes pot)</span>
                 </div>
               )}
               <button
                 className="pm-yes full glow"
                 disabled={
                   !isOpen ||
+                  modeAlreadyBet ||
                   (!!addr && mode.kind === "digit" && !HEX.includes(pick)) ||
-                  (!!addr && (mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock") && num === "")
+                  (!!addr && (mode.kind === "number" || mode.kind === "pvp") && num === "") ||
+                  (!!addr && mode.kind === "perfectblock" && (num.length !== 3 || pbPrefix === ""))
                 }
                 onClick={() => openBet(pick)}
               >
                 {!isOpen
                   ? "Locked"
-                  : !addr
-                    ? "Connect wallet to place bets"
-                    : mode.kind === "digit" && !HEX.includes(pick)
-                      ? "Pick a digit"
-                      : "Place Bet ◆ 0.01"}
+                  : modeAlreadyBet
+                    ? "✓ Already bet this round"
+                    : !addr
+                      ? "Connect wallet to place bets"
+                      : mode.kind === "digit" && !HEX.includes(pick)
+                        ? "Pick a digit"
+                        : "Place Bet ◆ 0.01"}
               </button>
-            </div>
-          )}
-
-          {myBets.length > 0 && (
-            <div className="mybets">
-              <div className="h">Your bets this round</div>
-              {myBets.map((b, i) => <div className="mybet" key={i}><span>{MODES.find((m) => m.id === b.mode)?.label} · <span className="pk">{b.pick}</span></span><span>◆ 0.01</span></div>)}
             </div>
           )}
         </motion.div>
