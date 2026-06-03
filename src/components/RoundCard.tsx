@@ -101,12 +101,7 @@ export default function RoundCard({
     mode.kind === "binary" ? mode.picks!.includes(finalPick) :
     mode.kind === "digit" ? HEX.includes(finalPick) :
     finalPick !== "";
-  // Perfect Block window is the 8:00–10:00 remaining slice of the round.
-  // Compute client-side from settleAt so the button disables instantly at 8:00
-  // without waiting for API refresh.
-  const pbWindowOpen = slot === "open" && isOpen && msToSettle >= 480000 && msToSettle <= 600000;
-  const pbBlocked = mode.id === "perfectblock" && !pbWindowOpen;
-  const canConfirm = isOpen && !!addr && validPick && !placing && !pbBlocked;
+  const canConfirm = isOpen && !!addr && validPick && !placing;
 
   const confirm = async () => {
     if (!canConfirm) return;
@@ -278,22 +273,14 @@ export default function RoundCard({
                     mode.kind === "perfectblock" ? "Exact block #" : `Enter ${mode.hint}`
                   }
                   value={num}
-                  disabled={mode.kind === "perfectblock" && pbBlocked}
                   onChange={(e) => setNum(e.target.value)}
                 />
               )}
               {mode.kind === "perfectblock" && (
                 <div style={{
                   fontSize: 12, color: "var(--text-2)", margin: "-6px 0 12px",
-                  display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8,
                 }}>
                   <span>Guess the exact block number to win <b style={{ color: "#fde047" }}>50×</b></span>
-                  {pbBlocked && (
-                    <span style={{
-                      fontSize: 10, fontWeight: 800, color: "#fb923c",
-                      letterSpacing: ".12em", textTransform: "uppercase",
-                    }}>⏱ Window Closed</span>
-                  )}
                 </div>
               )}
               <button
@@ -301,8 +288,7 @@ export default function RoundCard({
                 disabled={
                   !isOpen ||
                   (!!addr && mode.kind === "digit" && !HEX.includes(pick)) ||
-                  (!!addr && (mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock") && num === "") ||
-                  (mode.id === "perfectblock" && pbBlocked)
+                  (!!addr && (mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock") && num === "")
                 }
                 onClick={() => openBet(pick)}
               >
@@ -312,9 +298,7 @@ export default function RoundCard({
                     ? "Connect wallet to place bets"
                     : mode.kind === "digit" && !HEX.includes(pick)
                       ? "Pick a digit"
-                      : (mode.id === "perfectblock" && pbBlocked)
-                        ? "⏱ Window Closed"
-                        : "Place Bet ◆ 0.01"}
+                      : "Place Bet ◆ 0.01"}
               </button>
             </div>
           )}
