@@ -60,6 +60,20 @@ export default function RoundCard({
     }
   }, [round.result, round.id]);
 
+  // celebrate perfect-block 50× win when this round settles
+  React.useEffect(() => {
+    if (!round.result || !addr) return;
+    const perBet: any[] = round.result.perBet || [];
+    const won = perBet.some(
+      (b) => b.mode === "perfectblock" && b.win && String(b.wallet).toLowerCase() === addr,
+    );
+    if (won) {
+      setPbCelebrate(true);
+      const t = setTimeout(() => setPbCelebrate(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [round.result, addr]);
+
   // --- bank split for current binary mode (EVEN vs ODD style) ---
   const sideA = mode.kind === "binary" && mode.picks ? mode.picks[0] : "a";
   const sideB = mode.kind === "binary" && mode.picks ? mode.picks[1] : "b";
