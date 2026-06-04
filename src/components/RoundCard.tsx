@@ -38,6 +38,7 @@ export default function RoundCard({
   const [myBets, setMyBets] = React.useState<Array<{ mode: string; pick: string }>>([]);
   const [revealStep, setRevealStep] = React.useState(0);
   const [helpOpen, setHelpOpen] = React.useState(false);
+  const [toast, setToast] = React.useState<BetToastData | null>(null);
   // lever state: which side is pulled? resets when user goes Back or after confirm.
   const [leverPulled, setLeverPulled] = React.useState<string | null>(null);
   const [confirmPulled, setConfirmPulled] = React.useState(false);
