@@ -1,6 +1,7 @@
 import React from "react";
 import { Shield, Coins, RotateCcw } from "lucide-react";
 import { signals } from "../lib/modes";
+import Coin from "./Coin";
 
 // A real, already-settled LiteForge block (the one we analysed earlier).
 const DEMO_BLOCK = {
@@ -20,7 +21,7 @@ export default function DemoWidget() {
   return (
     <div className="demo-card">
       <div className="demo-head">
-        <span className="demo-badge"><Coins size={12} /> DEMO · Coin Flip</span>
+        <span className="demo-badge" style={{ color: "#FF6B00", background: "rgba(255,107,0,.12)", borderColor: "rgba(255,107,0,.35)" }}><Coins size={12} /> DEMO · Coin Flip</span>
         <span className="mono demo-bn">Block #{DEMO_BLOCK.number.toLocaleString()}</span>
       </div>
 
@@ -42,7 +43,7 @@ export default function DemoWidget() {
               hash mod 2 = <b>{result.toUpperCase()}</b> &nbsp;→&nbsp; you picked <b>{pick.toUpperCase()}</b>
             </div>
             <div className={`demo-result ${win ? "w" : "l"}`}>
-              {win ? "✓ YOU WIN · +0.0196 zkLTC" : "✗ You lose · hash was " + result.toUpperCase()}
+              {win ? <>✓ YOU WIN · +<Coin size={14} /> 0.0196 zkLTC</> : "✗ You lose · hash was " + result.toUpperCase()}
             </div>
             <a className="pf-btn" href={`https://liteforge.explorer.caldera.xyz/block/${DEMO_BLOCK.number}`} target="_blank" rel="noreferrer">
               <Shield size={11} /> Verify on explorer
