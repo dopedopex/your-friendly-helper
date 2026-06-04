@@ -7,6 +7,7 @@ import Coin from "./Coin";
 import ModeHelpModal from "./ModeHelpModal";
 import * as W from "../lib/wallet";
 import LeverSwitch from "./LeverSwitch";
+import BetToast, { type BetToastData } from "./BetToast";
 
 const BET = 0.01;
 
