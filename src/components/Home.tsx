@@ -7,7 +7,11 @@ export default function Home({ onEnter }: { onEnter: () => void }) {
     <div className="home">
       {/* hero */}
       <section className="hero">
-        <div className="hero-tag"><span className="pulse" /> Provably fair · Powered by LitVM blocks</div>
+        <img
+          className="hero-logo"
+          src="https://raw.githubusercontent.com/dopedopex/your-friendly-helper/main/logo.png"
+          alt="BetsOnBlock"
+        />
         <h1>Bet on the<br /><span className="grad">next block.</span></h1>
         <p className="hero-sub">
           Every outcome is decided by a future LiteForge block, its hash, its transactions, its gas.
